@@ -28,6 +28,13 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.Set;
 
+import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.List;
+import java.util.ArrayList;
+    
 import org.apache.velocity.tools.ConversionUtils;
 import org.apache.velocity.tools.XmlUtils;
 import org.json.simple.JSONArray;
@@ -224,6 +231,48 @@ public class JsonTool extends ImportSupport implements Iterable
         {
             return jsonObject == null ? jsonArray == null ? "null" : jsonArray.toString() : jsonObject.toString();
         }        
+
+        public Map<String,Object> getMap()
+        {
+            Map<String,Object> res = new HashMap<String,Object>();
+            if(jsonObject != null)
+                {
+                    Set<Entry<String, Object>> set_up = jsonObject.entrySet();
+                    Iterator<Entry<String,Object>> it = set_up.iterator();
+                    while(it.hasNext())
+                        {
+                            Entry<String,Object> e = it.next();
+                            res.put(e.getKey(),e.getValue());
+                        }
+
+                }
+            return res;
+        }
+
+        public List<Map<String,Object>> getMapList()
+        {
+            List<Map<String,Object>> res = new ArrayList<Map<String,Object>>();
+            if(jsonArray != null)
+                {
+                    for(Object o:jsonArray)
+                        {
+                            if(o instanceof JSONObject)
+                                {
+                                    Map<String,Object> jom = new HashMap<String,Object>();
+                                    Set<Entry<String, Object>> set_up = ((JSONObject)o).entrySet();
+                                    Iterator<Entry<String,Object>> it = set_up.iterator();
+                                    while(it.hasNext())
+                                        {
+                                            Entry<String,Object> e = it.next();
+                                            jom.put(e.getKey(),e.getValue());
+                                        }
+                                    res.add(jom);
+                                }
+                            //                            else log.warn("getMapList should be called only on simple jsonarray containing only jsonobjects");
+                        }
+                }
+            return res;
+        }
     }
     
     /**
@@ -470,4 +519,15 @@ public class JsonTool extends ImportSupport implements Iterable
     {
         return root == null ? null : root.toString();
     }
+
+    public Map<String,Object> extractMap()
+    {
+        return root == null ? null : root.getMap();
+    }
+
+    public List<Map<String,Object>> extractMapList()
+    {
+        return root == null ? null : root.getMapList();
+    }
+
 }
