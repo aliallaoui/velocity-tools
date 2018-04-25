@@ -19,8 +19,6 @@ package org.apache.velocity.tools;
  * under the License.
  */
 
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.lang.reflect.Array;
 import java.net.URL;
@@ -31,15 +29,20 @@ import java.text.FieldPosition;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentHashMap;
+import org.apache.commons.lang3.ArrayUtils;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility methods for parsing or otherwise converting between types.
@@ -840,5 +843,31 @@ public class ConversionUtils
         }
         catch (Exception e) {}
         return null;
+    }
+
+    public static List asList(Object value)
+    {
+        if (value instanceof List) return (List)value;
+        else if (value.getClass().isArray())
+        {
+            Class componentClass = value.getClass().getComponentType();
+            if (componentClass.isPrimitive())
+            {
+                if (componentClass.equals(char.class)) value = ArrayUtils.toObject((char[])value);
+                else if (componentClass.equals(long.class)) value = ArrayUtils.toObject((long[])value);
+                else if (componentClass.equals(int.class)) value = ArrayUtils.toObject((int[])value);
+                else if (componentClass.equals(short.class)) value = ArrayUtils.toObject((short[])value);
+                else if (componentClass.equals(byte.class)) value = ArrayUtils.toObject((byte[])value);
+                else if (componentClass.equals(double.class)) value = ArrayUtils.toObject((double[])value);
+                else if (componentClass.equals(float.class)) value = ArrayUtils.toObject((float[])value);
+            }
+            return new ArrayList(Arrays.asList((Object[])value));
+        }
+        else
+        {
+            List ret = new ArrayList();
+            ret.add(value);
+            return ret;
+        }
     }
 }
